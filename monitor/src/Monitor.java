@@ -54,11 +54,17 @@ public class Monitor {
         // e rastrear quais ids já foram vistos. Esse problema não tem solução limpa
         // com a API pura do espaço de tuplas — é justamente a limitação que o Nível 2B explora.
 
-        TaskEntry encontrada = null; // ← substitua esta linha
+        // ===================== ALTERAÇÃO 1 =====================
+        // Usa read() para observar uma tarefa sem removê-la do espaço.
+        TaskEntry encontrada = (TaskEntry) space.read(template, null, 0);
+        // TaskEntry encontrada = null; // ← substitua esta linha
 
+        // ===================== ALTERAÇÃO 2 =====================
         if (encontrada != null) {
-            count = 1; // ← implemente a contagem real acima e remova esta linha
+            count++;
+            //count = 1; // ← implemente a contagem real acima e remova esta linha
         }
+        // ======================================================
 
         return count;
     }
