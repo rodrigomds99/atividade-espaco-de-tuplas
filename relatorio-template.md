@@ -120,17 +120,48 @@ Preencha a tabela com base no que você observou nos logs:
 
 1. As tarefas de prioridade alta foram processadas antes das de prioridade baixa? Cole um trecho dos logs que evidencie isso:
 
+> _Resposta:_ Sim. O consumidor sempre buscou primeiro tarefas de prioridade alta (prioridade = 1). Somente após esgotá-las passou a consumir as tarefas de prioridade baixa (prioridade = 2), conforme demonstrado pelos logs abaixo.
+
 ```
-(cole o trecho de log aqui)
+[PRODUTOR] Espaço encontrado via lookup.
+[CONSUMIDOR-1] Espaço encontrado. Aguardando tarefas...
+
+[PRODUTOR] write: TaskEntry{id=1, tipo="calcular", prioridade=2}
+[PRODUTOR] write: TaskEntry{id=2, tipo="calcular", prioridade=1}
+[CONSUMIDOR-1] take: TaskEntry{id=2, tipo="calcular", prioridade=1}
+
+[PRODUTOR] write: TaskEntry{id=3, tipo="calcular", prioridade=2}
+[CONSUMIDOR-1] Processamento concluído: tarefa 2
+
+[PRODUTOR] write: TaskEntry{id=4, tipo="calcular", prioridade=1}
+[CONSUMIDOR-1] take: TaskEntry{id=4, tipo="calcular", prioridade=1}
+
+[PRODUTOR] write: TaskEntry{id=5, tipo="calcular", prioridade=1}
+[CONSUMIDOR-1] Processamento concluído: tarefa 4
+[CONSUMIDOR-1] take: TaskEntry{id=5, tipo="calcular", prioridade=1}
+
+[PRODUTOR] Todas as tarefas depositadas. Encerrando.
+[CONSUMIDOR-1] Processamento concluído: tarefa 5
+
+[CONSUMIDOR-1] Nenhuma tarefa de alta prioridade disponível. Buscando qualquer tarefa...
+[CONSUMIDOR-1] take: TaskEntry{id=1, tipo="calcular", prioridade=2}
+[CONSUMIDOR-1] Processamento concluído: tarefa 1
+
+[CONSUMIDOR-1] Nenhuma tarefa de alta prioridade disponível. Buscando qualquer tarefa...
+[CONSUMIDOR-1] take: TaskEntry{id=3, tipo="calcular", prioridade=2}
+[CONSUMIDOR-1] Processamento concluído: tarefa 3
+
+[CONSUMIDOR-1] Nenhuma tarefa de alta prioridade disponível. Buscando qualquer tarefa...
+
 ```
 
 2. O produtor precisou ser modificado para que isso funcionasse?
 
-> _Resposta:_
+> _Resposta:_ Não. Apenas o consumidor precisou selecionar as tarefas de acordo com a prioridade.
 
 3. Como o consumidor consegue selecionar apenas tarefas de uma prioridade específica? Qual mecanismo do espaço de tuplas torna isso possível?
 
-> _Resposta:_
+> _Resposta:_ Utilizando um template com o campo de prioridade preenchido. O mecanismo de correspondência por templates (matching) seleciona apenas as tuplas compatíveis.
 
 ---
 
@@ -138,20 +169,31 @@ Preencha a tabela com base no que você observou nos logs:
 
 1. Qual operação você usou no monitor — `read()` ou `take()`? Por quê a outra seria problemática?
 
-> _Resposta:_
+> **Resposta:** Foi utilizada a operação read(), pois ela permite observar as tarefas presentes no espaço sem removê-las. Se fosse utilizada take(), o monitor retiraria as tarefas do espaço, impedindo que os consumidores as processassem.
 
 2. Como você contou as tarefas pendentes usando apenas `read()`? Que limitação isso revela?
 
-> _Resposta:_
+> **Resposta:** O monitor utiliza read() para verificar se existe uma tarefa disponível sem removê-la do espaço. Essa abordagem evidencia uma limitação do modelo: o espaço de tuplas não possui uma operação nativa de contagem (count()), e apenas com read() não é possível contar corretamente todas as tarefas, pois a mesma entrada pode ser retornada em chamadas sucessivas.
 
 3. Por que um espaço de tuplas puro não tem operação `count()`? O que seria necessário adicionar ao modelo para suportá-la?
 
-> _Resposta:_
+> **Resposta:** Porque o modelo Linda oferece apenas operações básicas de escrita, leitura e remoção de tuplas. Para suportar uma contagem correta seria necessário adicionar uma operação específica de consulta ou manter metadados auxiliares sobre as tuplas armazenadas.
 
 Cole o trecho do `Monitor.java` que você completou:
 
 ```java
-// trecho relevante aqui
+private static int contarTarefas(JavaSpace space) throws Exception {
+    TaskEntry template = new TaskEntry(null, null, null);
+    int count = 0;
+
+    TaskEntry encontrada = (TaskEntry) space.read(template, null, 0);
+
+    if (encontrada != null) {
+        count++;
+    }
+
+    return count;
+}
 ```
 
 ---
