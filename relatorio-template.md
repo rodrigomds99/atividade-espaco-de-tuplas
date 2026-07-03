@@ -44,9 +44,9 @@ Preencha a tabela com base no que você observou nos logs:
 
 | Operação River | Equivalente Linda | O que ela faz? | Bloqueia quando não encontra correspondência? | Altera o estado do espaço? |
 |---------------|-------------------|----------------|----------------------------------------------|---------------------------|
-| `write(entry)` | `OUT` | | | |
-| `take(template)` | `IN` | | | |
-| `read(template)` | `RD` | | | |
+| `write(entry)`   | `OUT` | Insere uma tupla no espaço. | Não. | Sim. |
+| `take(template)` | `IN`  | Remove e retorna uma tupla compatível. | Sim. | Sim. |
+| `read(template)` | `RD`  | Lê uma tupla sem removê-la.| Sim. | Não.|
 
 ---
 
@@ -54,15 +54,15 @@ Preencha a tabela com base no que você observou nos logs:
 
 1. Quando o `reggie` caiu, os serviços que já estavam conectados ao espaço continuaram funcionando? Por quê?
 
-> _Resposta:_
+> _Resposta:_ Sim. Após descobrir o serviço, a comunicação ocorre diretamente com o espaço de tuplas.
 
 2. O que aconteceria com um produtor ou consumidor que tentasse iniciar enquanto o `reggie` estivesse fora do ar?
 
-> _Resposta:_
+> _Resposta:_ Eles não conseguiriam localizar o espaço de tuplas e não iniciariam corretamente.
 
 3. Qual sistema moderno cumpre papel equivalente ao `reggie` em uma arquitetura de microsserviços?
 
-> _Resposta:_
+> _Resposta:_ Um serviço de descoberta, como Consul, Eureka ou Kubernetes Service Discovery.
 
 ---
 
@@ -70,15 +70,15 @@ Preencha a tabela com base no que você observou nos logs:
 
 1. O produtor tem qualquer informação sobre quantos consumidores existem?
 
-> _Resposta:_
+> _Resposta:_ Não.
 
 2. O consumidor tem qualquer informação sobre quem produziu a tarefa que ele retirou?
 
-> _Resposta:_
+> _Resposta:_ Não.
 
 3. Como produtor e consumidor se coordenam se não se conhecem?
 
-> _Resposta:_
+> _Resposta:_ Ambos utilizam o espaço de tuplas como intermediário para compartilhar as tarefas.
 
 ---
 
@@ -86,15 +86,15 @@ Preencha a tabela com base no que você observou nos logs:
 
 1. O que o consumidor fez enquanto o espaço estava vazio?
 
-> _Observado:_
+> _Observado:_ Ficou aguardando até aparecer uma tarefa compatível.
 
 2. Quando o produtor depositou a primeira tarefa, o que aconteceu imediatamente?
 
-> _Observado:_
+> _Observado:_ O consumidor retirou a tarefa e iniciou seu processamento.
 
 3. Esse comportamento tem nome no modelo Linda. Qual é e por que ele é útil em sistemas distribuídos reais?
 
-> _Resposta:_
+> _Resposta:_ É o bloqueio da operação IN (take). Ele evita espera ativa e sincroniza automaticamente produtor e consumidor.
 
 ---
 
@@ -102,15 +102,15 @@ Preencha a tabela com base no que você observou nos logs:
 
 1. Uma mesma tarefa foi processada por dois consumidores ao mesmo tempo?
 
-> _Observado:_
+> _Observado:_ Não.
 
 2. O produtor precisou ser modificado para suportar dois consumidores?
 
-> _Resposta:_
+> _Resposta:_ Não.
 
 3. Esse comportamento tem um nome em arquitetura de sistemas. Qual é?
 
-> _Resposta:_
+> _Resposta:_ Balanceamento de carga (Load Balancing).
 
 ---
 
