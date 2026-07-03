@@ -1,8 +1,8 @@
 # Relatório — Atividade Prática: Espaço de Tuplas com Apache River
 
-**Disciplina:**
-**Dupla:** /
-**Data:**
+**Disciplina:*INE5418-05208 - Computação Distribuída*
+**Dupla:*Rodrigo Martins dos Santos* / Leonardo Fonseca Franchini
+**Data:*27/06/2025*
 
 ---
 
@@ -12,15 +12,15 @@
 
 1. Qual serviço aparece nos logs primeiro? Por que ele precisa existir antes dos outros?
 
-> _Resposta:_
+> _Resposta:_ O reggie aparece primeiro, pois ele é responsável pelo serviço de descoberta. Os demais componentes precisam dele para localizar o JavaSpace.
 
 2. O produtor menciona o nome ou o endereço do consumidor em algum momento? O consumidor menciona o produtor?
 
-> _Resposta:_
+> _Resposta:_ Não. Ambos apenas localizam o espaço de tuplas e se comunicam por meio dele.
 
 3. O consumidor começa a processar tarefas antes que o produtor termine de depositar todas? O que isso diz sobre como os dois se coordenam?
 
-> _Resposta:_
+> _Resposta:_ Sim. Isso mostra que produtor e consumidor trabalham de forma assíncrona e são coordenados pelo espaço de tuplas.
 
 ---
 
@@ -28,11 +28,11 @@
 
 4. O consumidor encontrou as tarefas mesmo sendo iniciado depois que o produtor já havia encerrado? O que isso demonstra?
 
-> _Resposta:_
+> _Resposta:_ Sim. Isso demonstra o desacoplamento temporal, pois as tarefas permanecem armazenadas no espaço até serem consumidas.
 
 5. Em comunicação direta via socket, seria possível esse comportamento? Por quê não?
 
-> _Resposta:_
+> _Resposta:_ Não. Em uma comunicação direta os dois processos normalmente precisam estar ativos ao mesmo tempo para trocar mensagens.
 
 ---
 
